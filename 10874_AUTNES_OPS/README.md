@@ -44,7 +44,7 @@ The dataset is available from AUSSDA as Scientific Use File and must be placed i
   - **Output:** A dataset containing RMSE values and a line graph visualizing those values.
 
 - **`10874_PANELPART.do`**  
-  - **Purpose:** Describes panel participation and its determinants
+  - **Purpose:** Describes panel participation and its determinants.
   - **Dependencies:** Requires Stata and "10874_da_en_v1_0.dta" as well as "targets_2017.dta" to "targets_2024.dta" as input datasets from the `data` folder.
   - **Output:** A stacked bar chart showing the number of interviews by entry wave, a linear regression analysis of participation across waves, and a coefficient plot visualizing key predictors.
   
