@@ -33,8 +33,7 @@ To run the scripts the following folder structure is needed:
 The dataset is available from AUSSDA as Scientific Use File and must be placed in the `data` folder:
 
 **Partheymüller, Julia; Aichholzer, Julian; Kritzinger, Sylvia; Wagner, Markus; Plescia, Carolina; Eberl, Jakob-Moritz; Meyer, Thomas; Boomgaarden, Hajo; Müller, Wolfgang C., 2024**  
-**"AUTNES Online Panel Study 2017-2024 (SUF edition)"**  
-[DOI: 10.11587/HNUFCC](https://doi.org/10.11587/HNUFCC), AUSSDA, V1, UNF:6:fPul6K0EtB3CEhJNCLaVqg== [fileUNF]
+**"AUTNES Online Panel Study 2017-2024 (SUF edition)"** [DOI: 10.11587/HNUFCC](https://doi.org/10.11587/HNUFCC), AUSSDA, V1, UNF:6:fPul6K0EtB3CEhJNCLaVqg== [fileUNF]
 
 
 #### **File Descriptions**
