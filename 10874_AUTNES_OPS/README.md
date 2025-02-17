@@ -1,6 +1,6 @@
 ### README
 
-#### **Project Overview**
+#### **Overview**
 This repository contains two Stata `.do` scripts:
 
 1. **`10874_RMSE.do`** - A script to compute the Root Mean Squared Error (RMSE) 
