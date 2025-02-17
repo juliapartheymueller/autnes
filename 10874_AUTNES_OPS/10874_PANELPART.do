@@ -1,6 +1,6 @@
 * ==============================================================================
 * PROJECT:		AUTNES Online Panel Study (2017-2024)
-* OBJECTIVE:	Data Paper: Panel Participation
+* OBJECTIVE:	        Data Paper: Panel Participation
 * AUTHOR:		JP
 * DATE: 		2025-02-17
 * ==============================================================================
