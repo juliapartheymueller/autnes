@@ -1,6 +1,6 @@
 * ==============================================================================
 * PROJECT:		AUTNES Online Panel Study (2017-2024)
-* OBJECTIVE:	Data Paper: Accuracy (RMSE)
+* OBJECTIVE:		Data Paper: Accuracy (RMSE)
 * AUTHOR:		JP
 * DATE: 		2025-02-17
 * ==============================================================================
@@ -562,7 +562,7 @@ foreach num of numlist 2/6 {
 append using "$DATA/W`num'_actual_share_2017.dta"
 }
 
-append using "$DATA/target_share_inclVOTE_2017.dta"
+append using "$DATA/targets_2017.dta"
 
 xpose, clear varname
 
@@ -622,7 +622,7 @@ rename	erwerb4caty19_d2	erwerb4cat_d2
 rename	erwerb4caty19_d3	erwerb4cat_d3
 rename	erwerb4caty19_d4	erwerb4cat_d4
 
-append using "$DATA/target_share_inclVOTE_2019.dta"
+append using "$DATA/targets_2019.dta"
 
 xpose, clear varname
 
@@ -684,7 +684,7 @@ rename erwerb4caty22_d2 erwerb4cat_d2
 rename erwerb4caty22_d3 erwerb4cat_d3
 rename erwerb4caty22_d4 erwerb4cat_d4
 
-append using "$DATA/target_share_inclVOTE_2022.dta"
+append using "$DATA/targets_2022.dta"
 
 xpose, clear varname
 
@@ -746,7 +746,7 @@ rename erwerb4caty24_d2 erwerb4cat_d2
 rename erwerb4caty24_d3 erwerb4cat_d3
 rename erwerb4caty24_d4 erwerb4cat_d4
 
-append using "$DATA/target_share_inclVOTE_2024.dta"
+append using "$DATA/targets_2024.dta"
 
 xpose, clear varname
 
