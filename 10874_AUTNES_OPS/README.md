@@ -37,13 +37,13 @@ The dataset is available from AUSSDA as Scientific Use File and must be placed i
 
 #### **File Descriptions**
 - **`10874_RMSE.do`**  
-  - **Purpose:** Computes RMSE or performs model validation.
-  - **Dependencies:** Requires Stata and input dataset from the `data` folder.
+  - **Purpose:** Computes RMSE values.
+  - **Dependencies:** Requires Stata and "10874_da_en_v1_0.dta" as input dataset from the `data` folder.
   - **Output:** A dataset containing RMSE values and a line graph visualizing those values.
 
 - **`10874_PANELPART.do`**  
   - **Purpose:** Describes panel participation and its determinants
-  - **Dependencies:** Requires Stata and input dataset from the `data` folder.
+  - **Dependencies:** Requires Stata and "10874_da_en_v1_0.dta" as well as "targets_2017.dta" to "targets_2024.dta" as input datasets from the `data` folder.
   - **Output:** A stacked bar chart showing the number of interviews by entry wave, a linear regression analysis of participation across waves, and a coefficient plot visualizing key predictors.
   
 #### **Author & License**
