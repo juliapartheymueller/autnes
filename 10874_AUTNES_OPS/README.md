@@ -6,12 +6,14 @@ This repository contains two Stata `.do` scripts:
 1. **`10874_RMSE.do`** - A script to compute the Root Mean Squared Error (RMSE) 
 2. **`10874_PANELPART.do`** - A script to describe and analyze panel participation
 
+It also includes four .dta files with target values for sociodemographic distributions and election results (based on information by Statistics Austria and the Austrian Federal Ministry of Interior).
+
 #### **Folder Structure**
 To run the scripts the following folder structure is needed:
 ```
 /project-root
 │── data/           # Contains datasets
-│   └── 10874_da_en_v1_0.dta
+│   └── 10874_da_en_v1_0.dta    # AUTNES Online Panel Study (to be retrieved from AUSSDA, see below)
 │   └── targets_2017.dta
 │   └── targets_2019.dta
 │   └── targets_2022.dta
