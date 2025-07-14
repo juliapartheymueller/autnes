@@ -1,14 +1,15 @@
 * ==============================================================================
 * PROJECT:		AUTNES Online Panel Study (2017-2024)
-* OBJECTIVE:	        Data Paper: Panel Participation
+* OBJECTIVE:	Data Paper: Panel Participation
 * AUTHOR:		JP
-* DATE: 		2025-02-17
+* DATE: 		2025-07-14
 * ==============================================================================
 
 * Paths
 global MAIN "INSERT_PATH"
 global DATA "$MAIN/data"
 global GRAPHS "$MAIN/graphs"
+global TABLES "$MAIN/tables"
 
 * Install required packages
 * ssc install fre, replace		// Optional: To display frequency tables
@@ -264,13 +265,199 @@ egen mean_leftright = rowmean(leftright_w*)
 
 lab var mean_leftright "Left-right self-placement"
 
+* Party identification
+* ------------------------------------------------------------------------------
+ds, has(varlabel "CLOSENESS TO A POLITICAL PARTY")
+return list
+
+foreach var of varlist `r(varlist)' {
+	local splitpos = ustrpos("`var'","_")
+	local prefix = substr("`var'",1,`splitpos'-1) 
+	local stub = "close1"
+	rename `var' `stub'_`prefix'
+}
+
+ds, has(varlabel "CLOSER TO ONE PARTY THAN TO ANOTHER")
+return list
+
+foreach var of varlist `r(varlist)' {
+	local splitpos = ustrpos("`var'","_")
+	local prefix = substr("`var'",1,`splitpos'-1) 
+	local stub = "close2"
+	rename `var' `stub'_`prefix'
+}
+
+ds, has(varlabel "PARTY R. FEELS CLOSER TO")
+return list
+
+foreach var of varlist `r(varlist)' {
+	local splitpos = ustrpos("`var'","_")
+	local prefix = substr("`var'",1,`splitpos'-1) 
+	local stub = "close3"
+	rename `var' `stub'_`prefix'
+}
+
+* Harmonizing coding
+recode close3_w1 (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (7=6) (99=.), gen(pid_w1)
+recode close3_w4f (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (7=6) (99=.), gen(pid_w4f)
+recode close3_w6f (1=1) (2=2) (3=3) (4=4) (5=5) (7=6) (99=.), gen(pid_w6f)
+recode close3_w7 (2=1) (1=2) (3=3) (6=4) (4=5) (5=6) (8=6) (99=.), gen(pid_w7)
+recode close3_w8 (2=1) (1=2) (3=3) (6=4) (4=5) (5=6) (8=6) (99=.), gen(pid_w8)
+recode close3_w9f (2=1) (1=2) (3=3) (6=4) (4=5) (5=6) (8=6) (99=.), gen(pid_w9f)
+recode close3_w10f (2=1) (1=2) (3=3) (6=4) (4=5) (5=6) (8=6) (99=.), gen(pid_w10f)
+recode close3_w11f (2=1) (1=2) (3=3) (6=4) (4=5) (5=6) (8=6) (99=.), gen(pid_w11f)
+recode close3_w12f (2=1) (1=2) (3=3) (6=4) (4=5) (5=6) (8=6) (99=.), gen(pid_w12f)
+recode close3_w13 (2=1) (1=2) (3=3) (4=4) (5=5) (6=6) (7=6) (11=6) (99=.), gen(pid_w13)
+recode close3_w14 (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (66=6) (99=.), gen(pid_w14)
+recode close3_w15f (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (66=6) (99=.), gen(pid_w15f)
+recode close3_w16 (1=1) (2=2) (3=3) (4=4) (5=5) (66=6) (99=.), gen(pid_w16)
+recode close3_w17f (1=1) (2=2) (3=3) (4=4) (5=5) (66=6) (99=.), gen(pid_w17f)
+recode close3_w18f (1=1) (2=2) (3=3) (4=4) (5=5) (66=6) (99=.), gen(pid_w18f)
+recode close3_w19f (1=1) (2=2) (3=3) (4=4) (5=5) (66=6) (99=.), gen(pid_w19f)
+recode close3_w20f (1=1) (2=2) (3=3) (4=4) (5=5) (66=6) (99=.), gen(pid_w20f)
+recode close3_w21f (1=1) (2=2) (3=3) (4=4) (5=5) (66=6) (99=.), gen(pid_w21f)
+recode close3_w22 (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (7=6) (8=6) (9=6) (66=6) (99=.), gen(pid_w22)
+recode close3_w23f (1=1) (2=2) (3=3) (4=4) (5=5) (6=6) (7=6) (8=6) (9=6) (66=6) (99=.), gen(pid_w23f)
+
+* Define value labels
+label define pid_lbl ///
+    1 "SPÖ" ///
+    2 "ÖVP" ///
+    3 "FPÖ" ///
+    4 "Greens" ///
+    5 "NEOS" ///
+    6 "Other party"	///
+	7 "None"
+
+* Assign value and variable labels
+foreach w in 1 4f 6f 7 8 9f 10f 11f 12f 13 14 15f 16 17f 18f 19f 20f 21f 22 23f {
+    replace pid_w`w' =7 if close1_w`w' == 2 & close2_w`w' == 2 
+	label values pid_w`w' pid_lbl
+    label variable pid_w`w' "Party Identification (harmonized)"
+}
+
+clonevar pid = pid_w1
+foreach w in 4f 6f 7 8 9f 10f 11f 12f 13 14 15f 16 17f 18f 19f 20f 21f 22 23f {
+	replace pid = pid_w`w' if pid==.
+}
+fre pid
+
+* Migration Attitudes
+* ------------------------------------------------------------------------------
+* Label define
+label define agree_revrs ///
+    1 "Completely disagree" ///
+    2 "Somewhat disagree" ///
+    3 "Partly agree/disagree" ///
+    4 "Somewhat agree" ///
+    5 "Completely agree" ///
+    88 "Don't know", replace
+
+* Immigrants should adapt to local customs
+clonevar migr1 = w23_q52x1
+recode migr1 (1=5) (2=4) (3=3) (4=2) (5=1), copy
+label values migr1 agree_revrs
+
+* Immigrants enrich Austrian culture
+clonevar migr2 = w23_q52x2
+recode migr2 (1=5) (2=4) (3=3) (4=2) (5=1), copy
+label values migr2 agree_revrs
+
+* Immigrants are good for the economy
+clonevar migr3 = w23_q52x3
+recode migr3 (1=5) (2=4) (3=3) (4=2) (5=1), copy
+label values migr3 agree_revrs
+
+* Immigrants take away jobs
+clonevar migr4 = w23_q52x4
+recode migr4 (1=5) (2=4) (3=3) (4=2) (5=1), copy
+label values migr4 agree_revrs
+
+* Immigration increases crime
+clonevar migr5 = w23_q52x5
+recode migr5 (1=5) (2=4) (3=3) (4=2) (5=1), copy
+label values migr5 agree_revrs
+
+* Immigrants contribute more to the social security system
+clonevar migr6 = w23_q52x6
+recode migr6 (1=5) (2=4) (3=3) (4=2) (5=1), copy
+label values migr6 agree_revrs
+
+* Straightlining
+* ------------------------------------------------------------------------------
+fre migr*
+gen straightlining_mig = 0 if !mi(migr1, migr2, migr3, migr4, migr5, migr6)
+replace straightlining_mig = 1 if migr1==1 & migr2 ==1 & migr3==1 & migr4==1 & migr5 ==1 & migr6==1
+replace straightlining_mig = 2 if migr1==2 & migr2 ==2 & migr3==2 & migr4==2 & migr5 ==2 & migr6==2
+replace straightlining_mig = 3 if migr1==3 & migr2 ==3 & migr3==3 & migr4==3 & migr5 ==3 & migr6==3
+replace straightlining_mig = 4 if migr1==4 & migr2 ==4 & migr3==4 & migr4==4 & migr5 ==4 & migr6==4
+replace straightlining_mig = 5 if migr1==5 & migr2 ==5 & migr3==5 & migr4==5 & migr5 ==5 & migr6==5
+replace straightlining_mig = 88 if migr1==88 & migr2 ==88 & migr3==88 & migr4==88 & migr5 ==88 & migr6==88
+recode straightlining_mig (1/5 88=1) (0=0)
+lab def straightlining_mig 1 "Yes" 0 "No"
+lab val straightlining_mig straightlining_mig
+lab var straightlining_mig "Straightlining"
+fre straightlining_mig
+
+* Item Non-Response
+* ------------------------------------------------------------------------------
+egen count_nonresponse = anycount(migr1 migr2 migr3 migr4 migr5 migr6), value(88)
+replace count_nonresponse =. if mi(migr1, migr2, migr3, migr4, migr5, migr6)
+
+* Attitude extremity
+* ------------------------------------------------------------------------------
+* Recode Don't Know (88) and missing to missing value (.)
+foreach var in migr1 migr2 migr3 migr4 migr5 migr6 {
+    recode `var' (88 = .)
+}
+
+* Generate extremity scores: absolute distance from midpoint (3)
+gen extrem1 = abs(migr1 - 3)
+gen extrem2 = abs(migr2 - 3)
+gen extrem3 = abs(migr3 - 3)
+gen extrem4 = abs(migr4 - 3)
+gen extrem5 = abs(migr5 - 3)
+gen extrem6 = abs(migr6 - 3)
+
+* Calculate average extremity (scale: 0 = neutral, 2 = most extreme)
+egen immig_extremity = rowmean(extrem1 extrem2 extrem3 extrem4 extrem5 extrem6)
+lab variable immig_extremity "Attitude Extremity (0–2 scale)"
+
+* Speeding (< 2sec per item)
+* ------------------------------------------------------------------------------
+recode w23_q52time (min/12=1) (13/max=0), gen(speeding)
+lab var speeding "Speeding"
+
+* Attention check: Failed
+* ------------------------------------------------------------------------------
+recode w23_q46x5 (4=0) (1/3=1) (5=1) (88/99=.), gen(attention_check_failed)
+lab def attention_check_lb 0 "passed" 1 "failed"
+lab val attention_check_failed attention_check_lb
+
+* Total Interview Duration
+* ------------------------------------------------------------------------------
+clonevar interview_duration = w23_intdur
+replace interview_duration = interview_duration / 60
+lab var interview_duration "Interview Duration (in Minutes)"
+
+* Self-Reported Diligence
+* ------------------------------------------------------------------------------
+clonevar diligence = w23_q81x3
+recode diligence (88/99 = .)
+revrs diligence, replace
+
 * ------------------------------------------------------------------------------
 * Save data file
 * ------------------------------------------------------------------------------
 * Select variables
 keep id w*_panelist entry_wave num_waves age24_6cat gender_male		///
 	edu5caty24 hhsize3caty24 erwerb4caty24 migrationy24 bula		///
-	mean_interest mean_leftright 
+	mean_interest mean_leftright pid 								///
+	w23_intdur w23_q52time w23_q81x4 w23_q46x5						///
+	migr* straightlining_mig count_nonresponse immig_extremity 		///
+	speeding														///
+	attention_check_failed interview_duration 						///
+	diligence
 
 * Save
 save "$DATA/panel_participation.dta", replace
@@ -340,6 +527,7 @@ graph bar (count) entry_wave_d* if panelist_w==1, 							///
 
 * Export graph
 graph export "$GRAPHS/figure3_panel_retention_sw.png", replace
+graph export "$GRAPHS/figure3_panel_retention_sw.pdf", replace
 
 
 * ------------------------------------------------------------------------------
@@ -349,28 +537,121 @@ graph export "$GRAPHS/figure3_panel_retention_sw.png", replace
 * Open data file
 use "$DATA/panel_participation.dta", clear
 
-/* fre num_waves age24_6cat gender_male								///
-	edu5caty24 hhsize3caty24 erwerb4caty24 migrationy24 bula		///
-	mean_interest mean_leftright */
-
-* Linear Regression
+* Linear Regression (without PID)
 regress num_waves b2.age24_6cat b0.gender_male			///
 	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
 	b0.migrationy24 b2.bula								///
 	mean_interest mean_leftright
+estimates store m1
+
+* Linear Regression (with PID)
+regress num_waves b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store m2	
 
 * Coefficient Plot: Determinants of Panel Participation
-set scheme white_tableau	
-coefplot, drop(_cons) xline(0) xtitle("Number of waves") xlabel(-2(1)4) 	///
+set scheme white_tableau
+graph set window fontface "Times"	
+coefplot m2, drop(_cons) xline(0) xtitle("Number of waves") xlabel(-2(1)4) 	///
 	 headings(	1.age24_6cat = "Age in years (ref. 30-39)"					///
 		 		1.edu5caty24 = "Education (ref. vocational school)"			///
 				2.hhsize3caty24 = "Household size (ref. 1 person)"			///
 				2.erwerb4caty24 = "Employment status (ref. employed)"		///
-				1.bula = "Federal state (ref. Tyrol)" ) ysize(10)			///
-				 mcolor("gs6") ciopts(color(gs6))
+				1.bula = "Federal state (ref. Tyrol)" 						///
+				2.pid = "Party Identification (ref. SPÖ)", nogap ) 			///
+				ysize(10)													///
+				mcolor("gs6") msize(small)									/// 
+				ciopts(lwidth(thin) color(gs6))
 
 * Export graph
-graph export "$GRAPHS/coefplot.png", replace
+graph export "$GRAPHS/figure4_coefplot.png", replace
+graph export "$GRAPHS/figure4_coefplot.pdf", replace
+
+
+* ------------------------------------------------------------------------------
+* Effects of Panel Participation on Response Behavior
+* ------------------------------------------------------------------------------
+
+* Open data file
+use "$DATA/panel_participation.dta", clear
+
+* Attention Check	
+regress attention_check_failed num_waves 				///
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m1
+	
+* Item Non-Response	
+regress count_nonresponse num_waves 					///
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m2
+	
+* Straightlining
+regress straightlining_mig num_waves 					////
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m3
+
+* Attitude Extremity
+regress immig_extremity num_waves 						///
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m4
+
+* Speeding 
+regress speeding num_waves 								///
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m5
+
+* Total Interview Duration
+regress interview_duration num_waves 					///
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m6
+
+* Self-Reported Diligence
+regress diligence num_waves 							///
+	b2.age24_6cat b2.age24_6cat b0.gender_male			///
+	b2.edu5caty24 b1.hhsize3caty24 b1.erwerb4caty24 	///
+	b0.migrationy24 b2.bula								///
+	mean_interest mean_leftright b1.pid
+estimates store  m7	
+
+* Table
+esttab m1 m2 m3 m4 m5 m6 m7, ///
+    keep(num_waves) ///
+    b(%9.3f) se(%9.3f) star(* 0.05 ** 0.01 *** 0.001) ///
+    r2 scalars(r2) ///
+    replace	///
+	label	///
+	note("Entries are unstandardized coefficients from linear regression, with standard errors in parentheses. Control variables include age, gender, education, household size, employment status, migration background, federal state, political interest, left-right placement, and party identification – not shown.")	///	
+	mtitles("Attention Check Failed" "Item Non-Response" "Straightlining" "Attitude Extremity" "Speeding" "Interview Duration" "Self-Reported Diligence")
+
+* Export table
+esttab m1 m2 m3 m4 m5 m6 m7 using "$TABLES/panel_quality.rtf", ///
+    keep(num_waves) ///
+    b(%9.3f) se(%9.3f) star(* 0.05 ** 0.01 *** 0.001) ///
+    r2 scalars(r2) ///
+    replace	///
+	label	///
+	note("Entries are unstandardized coefficients from linear regression, with standard errors in parentheses. Control variables include age, gender, education, household size, employment status, migration background, federal state, political interest, left-right placement, and party identification – not shown.")	///	
+	mtitles("Attention Check Failed" "Item Non-Response" "Straightlining" "Attitude Extremity" "Speeding" "Interview Duration" "Self-Reported Diligence")
 
 * ------------------------------------------------------------------------------
 * END OF FILE
